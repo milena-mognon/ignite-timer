@@ -1,19 +1,25 @@
-import { Play } from "phosphor-react";
-import { CountdownContainer, Separator } from "./Components/Countdown/styles";
+import { Play } from 'phosphor-react';
+import { useState } from 'react';
+import { CountdownContainer, Separator } from './Components/Countdown/styles';
 import {
   FormContainer,
   MinutesAmountInput,
   TaskInput,
-} from "./Components/NewCycleForm/styles";
+} from './Components/NewCycleForm/styles';
 
 import {
   HomeContainer,
   BaseCountdownButton,
   StartCountdownButton,
   StopCountdownButton,
-} from "./styles";
+} from './styles';
 
+// controlled: é quando mantemos em tempo real a informação  do input do usuário guardada no estado
+
+// uncontrolled:
 export function Home() {
+  const [task, setTask] = useState('');
+
   return (
     <HomeContainer>
       <form action="">
@@ -24,6 +30,8 @@ export function Home() {
             type="text"
             list="task-suggestions"
             placeholder="De um nome para seu projeto"
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
           />
 
           <datalist id="task-suggestions">
@@ -53,7 +61,7 @@ export function Home() {
           <span>0</span>
         </CountdownContainer>
 
-        <StartCountdownButton type="submit">
+        <StartCountdownButton disabled={!task} type="submit">
           <Play size="24" />
           Começar
         </StartCountdownButton>
