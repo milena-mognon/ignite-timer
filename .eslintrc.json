@@ -19,7 +19,6 @@
   "rules": {
     "import/prefer-default-export": "off",
     "prettier/prettier": "error",
-    "react/prop-types": "off",
     "no-unused-vars": "warn"
   }
 }
