@@ -38,6 +38,7 @@ interface Cycle {
 export function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
+  const [amountSecondsPasses, setAmountSecondsPassed] = useState(0);
 
   const { register, handleSubmit, watch, formState, reset } =
     useForm<NewCicleFormData>({
@@ -61,14 +62,20 @@ export function Home() {
   }
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
-
   // console.log(formState.errors);  consegue ver os erros
 
   const task = watch('task');
   const isSubmitDisabled = !task;
 
-  console.log(activeCycle);
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPasses : 0;
 
+  const minuteAmount = Math.floor(currentSeconds / 60);
+
+  const secondsAmount = currentSeconds % 60; // % operador de resto
+
+  const minutes = String(minuteAmount).padStart(2, '0');
+  const seconds = String(secondsAmount).padStart(2, '0');
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)}>
@@ -103,11 +110,11 @@ export function Home() {
         </FormContainer>
 
         <CountdownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdownContainer>
 
         <StartCountdownButton disabled={isSubmitDisabled} type="submit">
