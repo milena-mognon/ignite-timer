@@ -1,5 +1,5 @@
 import { Play } from 'phosphor-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CountdownContainer, Separator } from './Components/Countdown/styles';
 import {
   FormContainer,
@@ -17,6 +17,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import { string } from 'zod/lib';
+import { differenceInSeconds } from 'date-fns';
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
@@ -33,6 +34,7 @@ interface Cycle {
   id: string;
   task: string;
   minutesAmount: number;
+  startDate: Date;
 }
 
 export function Home() {
@@ -49,11 +51,24 @@ export function Home() {
       },
     });
 
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
+
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate)
+        );
+      }, 1000);
+    }
+  }, [activeCycle]);
+
   function handleCreateNewCycle(data: NewCicleFormData) {
     const newCycle: Cycle = {
       id: String(new Date().getTime()),
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(),
     };
 
     setCycles((state) => [...state, newCycle]); // state é o estado atual de cycles, antes do set
@@ -61,7 +76,6 @@ export function Home() {
     reset(); // volta para os valores default
   }
 
-  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
   // console.log(formState.errors);  consegue ver os erros
 
   const task = watch('task');
