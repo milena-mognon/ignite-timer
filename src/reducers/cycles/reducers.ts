@@ -1,4 +1,5 @@
 import { ActionTypes } from './actions';
+import { produce } from 'immer';
 
 interface CyclesState {
   cycles: Cycle[];
@@ -17,33 +18,41 @@ export interface Cycle {
 export function cyclesReducer(state: CyclesState, action: any) {
   switch (action.type) {
     case ActionTypes.ADD_NEW_CYCLE:
-      return {
-        ...state,
-        cycles: [...state.cycles, action.payload.newCycle],
-        activeCycleId: action.payload.newCycle.id,
-      };
-    case ActionTypes.INTERRUPT_CURRENT_CYCLE:
-      return {
-        ...state,
-        cycles: state.cycles.map((cycle) => {
-          if (cycle.id === state.activeCycleId) {
-            return { ...cycle, interruptedDate: new Date() };
-          }
-          return cycle;
-        }),
-        activeCycleId: null,
-      };
-    case ActionTypes.MARK_CURRENT_CYCLE_AS_FINISHED:
-      return {
-        ...state,
-        cycles: state.cycles.map((cycle) => {
-          if (cycle.id === state.activeCycleId) {
-            return { ...cycle, finishedDate: new Date() };
-          }
-          return cycle;
-        }),
-        activeCycleId: null,
-      };
+      /**
+       * produce da lib immer e usado aqui para trabalhar de forma mais fácil com a imutabilidade
+       * 1 parametro (state) é qual informação quer que seja alterada,
+       * 2 parametro (draft) é o rascunho, 'cópia do state', podemos usar ele de forma mutável
+       */
+      return produce(state, (draft) => {
+        //
+        draft.cycles.push(action.payload.newCycle);
+        draft.activeCycleId = action.payload.newCycle.id;
+      });
+
+    case ActionTypes.INTERRUPT_CURRENT_CYCLE: {
+      const currentCycleIndex = state.cycles.findIndex((cycle) => {
+        return cycle.id === state.activeCycleId;
+      });
+
+      if (currentCycleIndex < 0) return state;
+
+      return produce(state, (draft) => {
+        draft.activeCycleId = null;
+        draft.cycles[currentCycleIndex].interruptedDate = new Date();
+      });
+    }
+    case ActionTypes.MARK_CURRENT_CYCLE_AS_FINISHED: {
+      const currentCycleIndex = state.cycles.findIndex((cycle) => {
+        return cycle.id === state.activeCycleId;
+      });
+
+      if (currentCycleIndex < 0) return state;
+
+      return produce(state, (draft) => {
+        draft.activeCycleId = null;
+        draft.cycles[currentCycleIndex].finishedDate = new Date();
+      });
+    }
     default:
       return state;
   }
