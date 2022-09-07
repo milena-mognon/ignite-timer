@@ -32,7 +32,7 @@ O sistema salva o histórico dos ciclos no local storage.
 
 1. Acesse o diretório do projeto pelo terminal
 2. Baixe as dependências `yarn` ou `npm install`
-3. Execute o comando `yarn dev` ou `npm run dev` para inicia
+3. Execute o comando `yarn dev` ou `npm run dev` para iniciar
 4. Para acessar o sistema [http://localhost:3000](http://localhost:3000)
 
 ### Realizar Build
